@@ -24,15 +24,28 @@ class addScriptToQuestion extends PluginBase
   static protected $name = 'addScriptToQuestion';
   static protected $description = 'Allow to add easily script to question.';
 
-    /**
-    * Add function to be used in beforeQuestionRender event and to attriubute
-    */
-    public function init()
-    {
-      $this->subscribe('beforeQuestionRender','addScript');
-      $this->subscribe('newQuestionAttributes','addScriptAttribute');
-    }
+  protected $storage = 'DbStorage';
+  protected $settings = array(
+      'scriptPositionAvailable'=>array(
+          'type'=>'checkbox',
+          'label' => 'Show the scriptPosition attribute',
+          'default' => false,
+      ),
+  );
 
+  /**
+  * Add function to be used in beforeQuestionRender event and to attriubute
+  */
+  public function init()
+  {
+    $this->subscribe('beforeQuestionRender','addScript');
+    $this->subscribe('newQuestionAttributes','addScriptAttribute');
+  }
+
+  /**
+   * Add the script wjen question is rendered
+   * Add QID and SGQ replacement forced (because it's before this was added by core
+   */
   public function addScript()
   {
     $oEvent=$this->getEvent();
@@ -43,25 +56,30 @@ class addScriptToQuestion extends PluginBase
         'SGQ'=>$oEvent->get('sid')."X".$oEvent->get('gid').$oEvent->get('qid'),
       );
       $script=LimeExpressionManager::ProcessString($aAttributes['javascript'], $oEvent->get('qid'), $aReplacement, false, 1, 1, false, false, true);
+      $aAttributes['scriptPosition']=isset($aAttributes['scriptPosition']) ? $aAttributes['scriptPosition'] : CClientScript::POS_END;
       App()->getClientScript()->registerScript("scriptAttribute{$oEvent->get('qid')}",$script,$aAttributes['scriptPosition']);
     }
   }
 
+  /**
+   * The attribute, try to set to readonly for no XSS , but surely broken ....
+   */
   public function addScriptAttribute()
   {
     $scriptAttributes = array(
       'javascript'=>array(
         'types'=>'15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* Whole question type */
         'category'=>gT('Script'), /* Workaround ? Tony Partner :)))) ? */
-        'sortorder'=>1, /* If leave in own category */
+        'sortorder'=>1, /* Own category */
         'inputtype'=>'textarea',
-        'default'=>'', /* not nbeeded (it's already the default) */
+        'default'=>'', /* not needed (it's already the default) */
         'expression'=>1,/* As static */
         'help'=>gT('You don\'t have to add script tag, script is register by LimeSurvey. You can use Expression, this expression is static (no update during runtime).'),
         'caption'=>gT('Javascript for this question'),
-        'readonly'=>!(!Yii::app()->getConfig('filterxsshtml') || Permission::model()->hasGlobalPermission('superadmin','read')), /* This only set the readonly part: must rework on the system of readonly, and user still allowed to import js */
       ),
-      'scriptPosition'=>array(
+    );
+    if($this->get('scriptPositionAvailable',null,null,$this->settings['scriptPositionAvailable']['default'])){
+      $scriptAttributes['scriptPosition']=array(
         'types'=>'15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* Whole question type */
         'category'=>gT('Script'),
         'sortorder'=>1,
@@ -76,9 +94,8 @@ class addScriptToQuestion extends PluginBase
         'default'=>CClientScript::POS_END, /* This is really the best solution */
         'help'=>gT('Set the position of the script, see http://www.yiiframework.com/doc/api/1.1/CClientScript#registerScript-detail .'),
         'caption'=>gT('Position for the script'),
-        'readonly'=>Yii::app()->getConfig('filterxsshtml') && !Permission::model()->hasGlobalPermission('superadmin','read'), /* This only set the readonly part: must rework on the system of readonly, and user still allowed to import js */
-      ),
-    );
+      );
+    }
     $this->getEvent()->append('questionAttributes', $scriptAttributes);
   }
 
