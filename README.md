@@ -2,9 +2,8 @@
 
 Add for your admin user a question setting to put javascript snipet added when loading this question.
 
-**Compatibility** : Nee LS-SondagesPro release 1.1.0 and up or with LimeSurvey 2.50_plus_160731 and up.
-
-**Attention** : [filterxsshtml](https://manual.limesurvey.org/Optional_settings#Security) is not taken in account when loading attribute.
+- **Compatibility** : Nee LS-SondagesPro release 1.1.0 and up or with LimeSurvey 2.50_plus_160731 and up.
+- **filterxsshtml** : [filterxsshtml](https://manual.limesurvey.org/Optional_settings#Security) is not taken in account when loading attribute.
 
 
 ## Installation
