@@ -27,9 +27,21 @@ class addScriptToQuestion extends PluginBase
   protected $storage = 'DbStorage';
   protected $settings = array(
       'scriptPositionAvailable'=>array(
-          'type'=>'checkbox',
+          'type'=>'boolean',
           'label' => 'Show the scriptPosition attribute',
-          'default' => false,
+          'default' => 0,
+      ),
+      'scriptPositionDefault'=>array(
+          'type'=>'select',
+          'label' => 'Position for the script',
+          'options'=>array(
+            CClientScript::POS_HEAD=>"The script is inserted in the head section right before the title element (POS_HEAD).",
+            CClientScript::POS_BEGIN=>"The script is inserted at the beginning of the body section (POS_BEGIN).",
+            CClientScript::POS_END=>"The script is inserted at the end of the body section (POS_END).",
+            CClientScript::POS_LOAD=>"the script is inserted in the window.onload() function (POS_LOAD).",
+            CClientScript::POS_READY=>"the script is inserted in the jQuery's ready function (POS_READY).",
+          ),
+          'default'=>CClientScript::POS_END, /* This is really the best solution */
       ),
   );
 
@@ -91,7 +103,7 @@ class addScriptToQuestion extends PluginBase
           CClientScript::POS_LOAD=>"the script is inserted in the window.onload() function (POS_LOAD).",
           CClientScript::POS_READY=>"the script is inserted in the jQuery's ready function (POS_READY).",
         ),
-        'default'=>CClientScript::POS_END, /* This is really the best solution */
+        'default'=>$this->get('scriptPositionDefault',null,null,$this->settings['scriptPositionDefault']['default']),
         'help'=>gT('Set the position of the script, see http://www.yiiframework.com/doc/api/1.1/CClientScript#registerScript-detail .'),
         'caption'=>gT('Position for the script'),
       );
