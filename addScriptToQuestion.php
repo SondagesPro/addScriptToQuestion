@@ -6,7 +6,7 @@
  * @author Denis Chenu <denis@sondages.pro>
  * @copyright 2016 Denis Chenu <http://www.sondages.pro>
  * @license AGPL v3
- * @version 0.1.0
+ * @version 1.0.0
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE as published by
@@ -62,7 +62,7 @@ class addScriptToQuestion extends PluginBase
   {
     $oEvent=$this->getEvent();
     $aAttributes=QuestionAttribute::model()->getQuestionAttributes($oEvent->get('qid'));
-    if(trim($aAttributes['javascript'])){
+    if(isset($aAttributes['javascript']) && trim($aAttributes['javascript'])){
       $aReplacement=array(
         'QID'=>$oEvent->get('qid'),
         'SGQ'=>$oEvent->get('sid')."X".$oEvent->get('gid').$oEvent->get('qid'),
@@ -108,7 +108,18 @@ class addScriptToQuestion extends PluginBase
         'caption'=>gT('Position for the script'),
       );
     }
-    $this->getEvent()->append('questionAttributes', $scriptAttributes);
+    $lsVersion=App()->getConfig('versionnumber');
+    $aVersion=explode(" ",$lsVersion);
+    if(isset($aVersion[1]) && $aVersion[1]=='SondagesPro'){
+      $questionAttributes=(array)$this->event->get('questionAttributes');
+      $questionAttributes=array_merge($questionAttributes,$scriptAttributes);
+      $this->event->set('questionAttributes',$questionAttributes);
+    } else {
+      //~ $aLsApiVersion=explode(".",explode(" ",$aVersion[1]));
+      //~ if($aLsApiVersion[0] > 2 && (isset($aLsApiVersion[1]) && $aLsApiVersion[1] >= 58) ){
+        $this->getEvent()->append('questionAttributes', $scriptAttributes);
+      //~ }
+    }
   }
 
 }
