@@ -15,4 +15,4 @@ Add for your admin user a question setting to put javascript snipet added when l
 ## Home page & Copyright
 - HomePage <http://extensions.sondages.pro/>
 - Copyright © 2016 Denis Chenu <http://sondages.pro>
-- Licence : GNU Affero General Public License <https://www.gnu.org/licenses/gpl-3.0.html>
+- Licence : GNU Affero General Public License <https://www.gnu.org/licenses/agpl-3.0.html>
