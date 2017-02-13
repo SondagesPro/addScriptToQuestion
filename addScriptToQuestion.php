@@ -108,17 +108,15 @@ class addScriptToQuestion extends PluginBase
         'caption'=>gT('Position for the script'),
       );
     }
-    $lsVersion=App()->getConfig('versionnumber');
-    $aVersion=explode(" ",$lsVersion);
-    if(isset($aVersion[1]) && $aVersion[1]=='SondagesPro'){
+
+
+    if(method_exists($this->getEvent(),'append')) {
+      $this->getEvent()->append('questionAttributes', $scriptAttributes);
+      tracevar('append');
+    } else {
       $questionAttributes=(array)$this->event->get('questionAttributes');
       $questionAttributes=array_merge($questionAttributes,$scriptAttributes);
       $this->event->set('questionAttributes',$questionAttributes);
-    } else {
-      //~ $aLsApiVersion=explode(".",explode(" ",$aVersion[1]));
-      //~ if($aLsApiVersion[0] > 2 && (isset($aLsApiVersion[1]) && $aLsApiVersion[1] >= 58) ){
-        $this->getEvent()->append('questionAttributes', $scriptAttributes);
-      //~ }
     }
   }
 
