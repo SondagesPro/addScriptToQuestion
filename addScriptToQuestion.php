@@ -6,7 +6,7 @@
  * @author Denis Chenu <denis@sondages.pro>
  * @copyright 2016 Denis Chenu <http://www.sondages.pro>
  * @license AGPL v3
- * @version 1.0.0
+ * @version 1.0.1
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE as published by
@@ -112,7 +112,6 @@ class addScriptToQuestion extends \ls\pluginmanager\PluginBase
 
     if(method_exists($this->getEvent(),'append')) {
       $this->getEvent()->append('questionAttributes', $scriptAttributes);
-      tracevar('append');
     } else {
       $questionAttributes=(array)$this->event->get('questionAttributes');
       $questionAttributes=array_merge($questionAttributes,$scriptAttributes);
