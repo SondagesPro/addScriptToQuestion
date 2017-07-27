@@ -6,7 +6,7 @@
  * @author Denis Chenu <denis@sondages.pro>
  * @copyright 2016 Denis Chenu <http://www.sondages.pro>
  * @license AGPL v3
- * @version 1.0.1
+ * @version 1.0.2
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE as published by
@@ -65,7 +65,7 @@ class addScriptToQuestion extends \ls\pluginmanager\PluginBase
     if(isset($aAttributes['javascript']) && trim($aAttributes['javascript'])){
       $aReplacement=array(
         'QID'=>$oEvent->get('qid'),
-        'SGQ'=>$oEvent->get('sid')."X".$oEvent->get('gid').$oEvent->get('qid'),
+        'SGQ'=>$oEvent->get('surveyId')."X".$oEvent->get('gid')."X".$oEvent->get('qid'),
       );
       $script=LimeExpressionManager::ProcessString($aAttributes['javascript'], $oEvent->get('qid'), $aReplacement, false, 1, 1, false, false, true);
       $aAttributes['scriptPosition']=isset($aAttributes['scriptPosition']) ? $aAttributes['scriptPosition'] : CClientScript::POS_END;
