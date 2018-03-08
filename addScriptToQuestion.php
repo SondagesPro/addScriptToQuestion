@@ -4,9 +4,9 @@
  * @todo Show (and update/add) the settings according to XSS
  *
  * @author Denis Chenu <denis@sondages.pro>
- * @copyright 2016 Denis Chenu <http://www.sondages.pro>
+ * @copyright 2016-2018 Denis Chenu <http://www.sondages.pro>
  * @license AGPL v3
- * @version 1.0.2
+ * @version 2.0.0
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE as published by
@@ -18,7 +18,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
-class addScriptToQuestion extends \ls\pluginmanager\PluginBase
+class addScriptToQuestion extends PluginBase
 {
 
   static protected $name = 'addScriptToQuestion';
@@ -67,7 +67,11 @@ class addScriptToQuestion extends \ls\pluginmanager\PluginBase
         'QID'=>$oEvent->get('qid'),
         'SGQ'=>$oEvent->get('surveyId')."X".$oEvent->get('gid')."X".$oEvent->get('qid'),
       );
-      $script=LimeExpressionManager::ProcessString($aAttributes['javascript'], $oEvent->get('qid'), $aReplacement, false, 1, 1, false, false, true);
+      if(intval(Yii::app()->getConfig('version')) >=3) {
+        $script=LimeExpressionManager::ProcessString($aAttributes['javascript'], $oEvent->get('qid'), $aReplacement, 2, 0, false, false, true);
+      } else {
+        $script=LimeExpressionManager::ProcessString($aAttributes['javascript'], $oEvent->get('qid'), $aReplacement, false, 2, 0, false, false, true);
+      }
       $aAttributes['scriptPosition']=isset($aAttributes['scriptPosition']) ? $aAttributes['scriptPosition'] : CClientScript::POS_END;
       App()->getClientScript()->registerScript("scriptAttribute{$oEvent->get('qid')}",$script,$aAttributes['scriptPosition']);
     }
@@ -86,6 +90,7 @@ class addScriptToQuestion extends \ls\pluginmanager\PluginBase
         'inputtype'=>'textarea',
         'default'=>'', /* not needed (it's already the default) */
         'expression'=>1,/* As static */
+        'readonly'=>Yii::app()->getConfig('filterxsshtml') && !Permission::model()->hasGlobalPermission('superadmin', 'read'),
         'help'=>gT('You don\'t have to add script tag, script is register by LimeSurvey. You can use Expression, this expression is static (no update during runtime).'),
         'caption'=>gT('Javascript for this question'),
       ),
