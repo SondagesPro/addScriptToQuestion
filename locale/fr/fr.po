@@ -1,0 +1,70 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: addScriptToQuestion\n"
+"POT-Creation-Date: 2018-03-09 16:07+0100\n"
+"PO-Revision-Date: 2018-03-09 16:17+0100\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.0.6\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: gT\n"
+"Last-Translator: Denis Chenu <contact@sondages.pro>\n"
+"Language: fr\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: locale\n"
+
+#: addScriptToQuestion.php:88 addScriptToQuestion.php:101
+msgid "Script"
+msgstr "Script"
+
+#: addScriptToQuestion.php:94
+msgid ""
+"You don't have to add script tag, script is register by LimeSurvey. You can "
+"use expressions, this one is static (no update during run-time)."
+msgstr ""
+"Vous n‘avez pas à ajouter la balise script, celle-ci est gérée par "
+"LimeSurvey. Vous pouvez utiliser les expressions, celles-ci sont statiques "
+"(pas de mise à jour en réel)."
+
+#: addScriptToQuestion.php:95
+msgid "Javascript for this question"
+msgstr "Java-script pour cette question"
+
+#: addScriptToQuestion.php:105
+msgid ""
+"The script is inserted in the head section right before the title element "
+"(POS_HEAD)."
+msgstr ""
+"Le script est inséré dans la partie head juste avant la balise title "
+"(POS_HEAD)."
+
+#: addScriptToQuestion.php:106
+msgid ""
+"The script is inserted at the beginning of the body section (POS_BEGIN)."
+msgstr "Le script est inséré au début de la partie body (POS_BEGIN)."
+
+#: addScriptToQuestion.php:107
+msgid "The script is inserted at the end of the body section (POS_END)."
+msgstr "Le script est inséré à la fin de la partie body (POS_END)."
+
+#: addScriptToQuestion.php:108
+msgid "The script is inserted in the window.onload() function (POS_LOAD)."
+msgstr "Le script est inséré dans la fonction windows.onload() (POS_LOAD)."
+
+#: addScriptToQuestion.php:109
+msgid "The script is inserted in the jQuery's ready function (POS_READY)."
+msgstr "Le script est inséré dans la fonction de jQuery ready (POS_READY)."
+
+#: addScriptToQuestion.php:113
+#, php-format
+msgid "Set the position of the script, see <a href=\"%s\">Yii manual</a>."
+msgstr ""
+"Décider de la position du script, voir <a href=\"%s\">la manuel de Yii</a>."
+
+#: addScriptToQuestion.php:114
+msgid "Position for the script"
+msgstr "Position du script"

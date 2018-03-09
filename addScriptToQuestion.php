@@ -1,12 +1,11 @@
 <?php
 /**
  * Allow to add script to question.
- * @todo Show (and update/add) the settings according to XSS
  *
  * @author Denis Chenu <denis@sondages.pro>
  * @copyright 2016-2018 Denis Chenu <http://www.sondages.pro>
  * @license AGPL v3
- * @version 2.1.0
+ * @version 2.2.0
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE as published by
@@ -82,6 +81,7 @@ class addScriptToQuestion extends PluginBase
    */
   public function addScriptAttribute()
   {
+    $readonly = Yii::app()->getConfig('filterxsshtml') && !Permission::model()->hasGlobalPermission('superadmin', 'read');
     $scriptAttributes = array(
       'javascript'=>array(
         'types'=>'15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* Whole question type */
@@ -90,28 +90,28 @@ class addScriptToQuestion extends PluginBase
         'inputtype'=>'textarea',
         'default'=>'', /* not needed (it's already the default) */
         'expression'=>1,/* As static */
-        'readonly'=>Yii::app()->getConfig('filterxsshtml') && !Permission::model()->hasGlobalPermission('superadmin', 'read'),
-        'help'=>gT('You don\'t have to add script tag, script is register by LimeSurvey. You can use Expression, this expression is static (no update during runtime).'),
-        'caption'=>gT('Javascript for this question'),
+        'readonly'=>$readonly,
+        'help'=>$this->gT("You don't have to add script tag, script is register by LimeSurvey. You can use expressions, this one is static (no update during run-time)."),
+        'caption'=>$this->gT('Javascript for this question'),
       ),
     );
-    if($this->get('scriptPositionAvailable',null,null,$this->settings['scriptPositionAvailable']['default'])){
+    if($this->get('scriptPositionAvailable',null,null,$this->settings['scriptPositionAvailable']['default']) && !$readonly){
       $scriptAttributes['scriptPosition']=array(
         'types'=>'15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* Whole question type */
         'category'=>gT('Script'),
         'sortorder'=>1,
         'inputtype'=>'singleselect',
         'options'=>array(
-          CClientScript::POS_HEAD=>"The script is inserted in the head section right before the title element (POS_HEAD).",
-          CClientScript::POS_BEGIN=>"The script is inserted at the beginning of the body section (POS_BEGIN).",
-          CClientScript::POS_END=>"The script is inserted at the end of the body section (POS_END).",
-          CClientScript::POS_LOAD=>"the script is inserted in the window.onload() function (POS_LOAD).",
-          CClientScript::POS_READY=>"the script is inserted in the jQuery's ready function (POS_READY).",
+          CClientScript::POS_HEAD=>$this->gT("The script is inserted in the head section right before the title element (POS_HEAD)."),
+          CClientScript::POS_BEGIN=>$this->gT("The script is inserted at the beginning of the body section (POS_BEGIN)."),
+          CClientScript::POS_END=>$this->gT("The script is inserted at the end of the body section (POS_END)."),
+          CClientScript::POS_LOAD=>$this->gT("The script is inserted in the window.onload() function (POS_LOAD)."),
+          CClientScript::POS_READY=>$this->gT("The script is inserted in the jQuery's ready function (POS_READY)."),
         ),
         'default'=>$this->get('scriptPositionDefault',null,null,$this->settings['scriptPositionDefault']['default']),
         'readonly'=>Yii::app()->getConfig('filterxsshtml') && !Permission::model()->hasGlobalPermission('superadmin', 'read'),
-        'help'=>gT('Set the position of the script, see http://www.yiiframework.com/doc/api/1.1/CClientScript#registerScript-detail .'),
-        'caption'=>gT('Position for the script'),
+        'help'=>sprintf($this->gT('Set the position of the script, see <a href="%s">Yii manual</a>.'),'http://www.yiiframework.com/doc/api/1.1/CClientScript#registerScript-detail'),
+        'caption'=>$this->gT('Position for the script'),
       );
     }
 
