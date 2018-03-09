@@ -6,7 +6,7 @@ This add a new advanced setting in all question where user can just put javascri
 
 - **Compatibility** : Need [LS-SondagesPro](https://github.com/SondagesPro/LimeSurvey-SondagesPro) release 1.1.0 and up or with [LimeSurvey](https://www.limesurvey.org/) 2.50_plus_160731 and up.
   - With LimeSurvey 2.63 version : you must use 1.0.2
-- **filterxsshtml** : [filterxsshtml](https://manual.limesurvey.org/Optional_settings#Security) is not taken in account when loading attribute.
+- **filterxsshtml** : [filterxsshtml](https://manual.limesurvey.org/Optional_settings#Security) if it's activated, admin user see it like a readonly attribute (since 2.1.0)
 
 ## Installation
 
@@ -25,6 +25,7 @@ This add a new advanced setting in all question where user can just put javascri
 - Licence : GNU Affero General Public License <https://www.gnu.org/licenses/agpl-3.0.html>
 
 ## Changelog
+- 2018-03-09 [2.1.0] Usage of XSS security
 - 2018-03-08 [2.0.0] LimeSurvey 3.X version (tested on 3.4.4)
 - 2017-06-27 [1.0.2] Fix {SGQ} replacement
 - 2017-02-20 [1.0.0] Some fix, and compatibility

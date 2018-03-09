@@ -6,7 +6,7 @@
  * @author Denis Chenu <denis@sondages.pro>
  * @copyright 2016-2018 Denis Chenu <http://www.sondages.pro>
  * @license AGPL v3
- * @version 2.0.0
+ * @version 2.1.0
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE as published by
@@ -109,6 +109,7 @@ class addScriptToQuestion extends PluginBase
           CClientScript::POS_READY=>"the script is inserted in the jQuery's ready function (POS_READY).",
         ),
         'default'=>$this->get('scriptPositionDefault',null,null,$this->settings['scriptPositionDefault']['default']),
+        'readonly'=>Yii::app()->getConfig('filterxsshtml') && !Permission::model()->hasGlobalPermission('superadmin', 'read'),
         'help'=>gT('Set the position of the script, see http://www.yiiframework.com/doc/api/1.1/CClientScript#registerScript-detail .'),
         'caption'=>gT('Position for the script'),
       );
