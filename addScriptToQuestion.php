@@ -61,7 +61,7 @@ class addScriptToQuestion extends PluginBase
   {
     $oEvent=$this->getEvent();
     $aAttributes=QuestionAttribute::model()->getQuestionAttributes($oEvent->get('qid'));
-    if(isset($aAttributes['javascript']) && trim($aAttributes['javascript'])){
+    if(isset($aAttributes['javascript']) && trim($aAttributes['javascript']) && $aAttributes['scriptActivate'] == 1){
       $aReplacement=array(
         'QID'=>$oEvent->get('qid'),
         'SGQ'=>$oEvent->get('surveyId')."X".$oEvent->get('gid')."X".$oEvent->get('qid'),
@@ -83,10 +83,18 @@ class addScriptToQuestion extends PluginBase
   {
     $readonly = Yii::app()->getConfig('filterxsshtml') && !Permission::model()->hasGlobalPermission('superadmin', 'read');
     $scriptAttributes = array(
+      'scriptActivate' => array(
+        'types'     => '15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* all question types */
+        'category'  => gT('Script'),					  /* translations? */
+        'sortorder' => 1,
+        'inputtype' => 'switch',
+        'caption'   => 'Activate script execution',
+        'default'   => '1',
+      ),
       'javascript'=>array(
         'types'=>'15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* Whole question type */
         'category'=>gT('Script'), /* Workaround ? Tony Partner :)))) ? */
-        'sortorder'=>1, /* Own category */
+        'sortorder'=>3, /* Own category */
         'inputtype'=>'textarea',
         'default'=>'', /* not needed (it's already the default) */
         'expression'=>1,/* As static */
@@ -99,7 +107,7 @@ class addScriptToQuestion extends PluginBase
       $scriptAttributes['scriptPosition']=array(
         'types'=>'15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* Whole question type */
         'category'=>gT('Script'),
-        'sortorder'=>1,
+        'sortorder'=>2,
         'inputtype'=>'singleselect',
         'options'=>array(
           CClientScript::POS_HEAD=>$this->gT("The script is inserted in the head section right before the title element (POS_HEAD)."),
