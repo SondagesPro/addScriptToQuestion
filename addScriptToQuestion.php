@@ -66,7 +66,7 @@ class addScriptToQuestion extends PluginBase
         'QID'=>$oEvent->get('qid'),
         'SGQ'=>$oEvent->get('surveyId')."X".$oEvent->get('gid')."X".$oEvent->get('qid'),
       );
-      if(intval(Yii::app()->getConfig('version')) >=3) {
+      if(intval(Yii::app()->getConfig('versionnumber')) >=3) {
         $script=LimeExpressionManager::ProcessString($aAttributes['javascript'], $oEvent->get('qid'), $aReplacement, 2, 0, false, false, true);
       } else {
         $script=LimeExpressionManager::ProcessString($aAttributes['javascript'], $oEvent->get('qid'), $aReplacement, false, 2, 0, false, false, true);
