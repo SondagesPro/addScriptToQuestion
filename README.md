@@ -28,7 +28,7 @@ If there are issue with english string : it's a PHP issue, not a language issue.
 
 ## Home page & Copyright
 - HomePage <http://extensions.sondages.pro/>
-- Copyright © 2016 Denis Chenu <http://sondages.pro>
+- Copyright © 2016-2018 Denis Chenu <http://sondages.pro>
 - Licence : GNU Affero General Public License <https://www.gnu.org/licenses/agpl-3.0.html>
 
 ## Changelog
