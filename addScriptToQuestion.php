@@ -5,7 +5,7 @@
  * @author Denis Chenu <denis@sondages.pro>
  * @copyright 2016-2018 Denis Chenu <http://www.sondages.pro>
  * @license AGPL v3
- * @version 2.2.0
+ * @version 2.2.2
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE as published by
@@ -54,8 +54,8 @@ class addScriptToQuestion extends PluginBase
   }
 
   /**
-   * Add the script wjen question is rendered
-   * Add QID and SGQ replacement forced (because it's before this was added by core
+   * Add the script when question is rendered
+   * Add QID and SGQ replacement forced (because it's before this was added by core)
    */
   public function addScript()
   {
@@ -64,6 +64,7 @@ class addScriptToQuestion extends PluginBase
     if(isset($aAttributes['javascript']) && trim($aAttributes['javascript'])){
       $aReplacement=array(
         'QID'=>$oEvent->get('qid'),
+        'GID'=>$oEvent->get('gid'),
         'SGQ'=>$oEvent->get('surveyId')."X".$oEvent->get('gid')."X".$oEvent->get('qid'),
       );
       if(floatval(Yii::app()->getConfig('versionnumber')) >=3) {
@@ -77,7 +78,7 @@ class addScriptToQuestion extends PluginBase
   }
 
   /**
-   * The attribute, try to set to readonly for no XSS , but surely broken ....
+   * The attribute, use readonly for 3.X version
    */
   public function addScriptAttribute()
   {
@@ -115,7 +116,6 @@ class addScriptToQuestion extends PluginBase
       );
     }
 
-
     if(method_exists($this->getEvent(),'append')) {
       $this->getEvent()->append('questionAttributes', $scriptAttributes);
     } else {
@@ -124,5 +124,4 @@ class addScriptToQuestion extends PluginBase
       $this->event->set('questionAttributes',$questionAttributes);
     }
   }
-
 }
