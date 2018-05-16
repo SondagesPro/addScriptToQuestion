@@ -5,7 +5,7 @@
  * @author Denis Chenu <denis@sondages.pro>
  * @copyright 2016-2018 Denis Chenu <http://www.sondages.pro>
  * @license AGPL v3
- * @version 2.2.2
+ * @version 2.3.0
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE as published by
@@ -55,13 +55,13 @@ class addScriptToQuestion extends PluginBase
 
   /**
    * Add the script when question is rendered
-   * Add QID and SGQ replacement forced (because it's before this was added by core)
+   * Add QID and SGQ replacement forced (because it's before this was added by core
    */
   public function addScript()
   {
     $oEvent=$this->getEvent();
     $aAttributes=QuestionAttribute::model()->getQuestionAttributes($oEvent->get('qid'));
-    if(isset($aAttributes['javascript']) && trim($aAttributes['javascript'])){
+    if(isset($aAttributes['javascript']) && trim($aAttributes['javascript']) && $aAttributes['scriptActivate'] == 1){
       $aReplacement=array(
         'QID'=>$oEvent->get('qid'),
         'GID'=>$oEvent->get('gid'),
@@ -84,6 +84,14 @@ class addScriptToQuestion extends PluginBase
   {
     $readonly = Yii::app()->getConfig('filterxsshtml') && !Permission::model()->hasGlobalPermission('superadmin', 'read');
     $scriptAttributes = array(
+      'scriptActivate' => array(
+        'types'     => '15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* all question types */
+        'category'  => gT('Script'),
+        'sortorder' => 1,
+        'inputtype' => 'switch',
+        'caption'   => 'Activate script execution',
+        'default'   => '1',
+      ),
       'javascript'=>array(
         'types'=>'15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* Whole question type */
         'category'=>gT('Script'), /* Workaround ? Tony Partner :)))) ? */
