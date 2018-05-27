@@ -19,12 +19,11 @@ This add a new advanced setting in all question where user can just put javascri
 - Extract : `unzip addScriptToQuestion.zip`
 - Move the directory to plugins/ directory inside LimeSurvey
 
-## Contribute
+## Contribute and issue
 
-Contribution are welcome, for patch and issue : use [gitlab](https://gitlab.com/SondagesPro/addScriptToQuestion) still the preferred solution.
+Contribution are welcome, for patch and issue : use [gitlab](https://gitlab.com/SondagesPro/addScriptToQuestion).
 
-Translation can be done at [translate.sondages.pro](https://translate.sondages.pro/projects/addscripttoquestion/).
-If there are issue with english string : it's a PHP issue, not a language issue.
+Translation can be done at [translate.sondages.pro](https://translate.sondages.pro/projects/addscripttoquestion/). If there are issue with english string : it's a PHP issue, not a language issue.
 
 ## Home page & Copyright
 - HomePage <http://extensions.sondages.pro/>
