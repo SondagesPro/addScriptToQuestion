@@ -31,6 +31,7 @@ Translation can be done at [translate.sondages.pro](https://translate.sondages.p
 - Licence : GNU Affero General Public License <https://www.gnu.org/licenses/agpl-3.0.html>
 
 ## Changelog
+- 2018-05-27 [2.3.1] Quick enable/disable script
 - 2018-03-09 [2.2.0] Translation
 - 2018-03-09 [2.1.0] Usage of XSS security
 - 2018-03-08 [2.0.0] LimeSurvey 3.X version (tested on 3.4.4)
