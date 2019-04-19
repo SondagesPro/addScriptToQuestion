@@ -5,7 +5,7 @@
  * @author Denis Chenu <denis@sondages.pro>
  * @copyright 2016-2018 Denis Chenu <http://www.sondages.pro>
  * @license AGPL v3
- * @version 2.4.0
+ * @version 2.4.1
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE as published by
@@ -74,9 +74,9 @@ class addScriptToQuestion extends PluginBase
         $script=LimeExpressionManager::ProcessString($aAttributes['javascript'], $oEvent->get('qid'), $aReplacement, false, 2, 0, false, false, true);
       }
       if($this->get('scriptPositionAvailable')) {
-        $scriptPosition = isset($aAttributes['scriptPosition']) ? $aAttributes['scriptPosition'] : $this->get('scriptPositionDefault');
+        $scriptPosition = isset($aAttributes['scriptPosition']) ? $aAttributes['scriptPosition'] : $this->get('scriptPositionDefault',null,null,$this->setting['scriptPositionDefault']['default']);
       } else {
-        $scriptPosition = $this->get('scriptPositionDefault');
+        $scriptPosition = $this->get('scriptPositionDefault',null,null,$this->setting['scriptPositionDefault']['default']);
       }
       if($scriptPosition == 'afteranswer') {
         $script = "\n\n<script type=\"text/javascript\">\n"
@@ -85,7 +85,7 @@ class addScriptToQuestion extends PluginBase
         $oEvent->set('answers',$oEvent->get('answers').$script);
         return;
       }
-      App()->getClientScript()->registerScript("scriptAttribute{$oEvent->get('qid')}",$script,$aAttributes['scriptPosition']);
+      App()->getClientScript()->registerScript("scriptAttribute{$oEvent->get('qid')}",$script,$scriptPosition);
     }
   }
 
