@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <metadata>
+        <name>addScriptToQuestion</name>
+        <type>plugin</type>
+        <creationDate>2016-11-17</creationDate>
+        <lastUpdate>2019-04-19</lastUpdate>
+        <author>Denis Chenu</author>
+        <authorUrl>https://extensions.sondages.pro/addscripttoquestion</authorUrl>
+        <supportUrl>https://support.sondages.pro/</supportUrl>
+        <version>2.0.1</version>
+        <license>GNU Affero General Public License v3.0</license>
+        <description><![CDATA[Allow to add easily script to question.]]></description>
+    </metadata>
+
+    <compatibility>
+        <version>2.73</version>
+        <version>3.0</version>
+    </compatibility>
+</config>
