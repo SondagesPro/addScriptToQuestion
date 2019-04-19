@@ -5,7 +5,7 @@
  * @author Denis Chenu <denis@sondages.pro>
  * @copyright 2016-2018 Denis Chenu <http://www.sondages.pro>
  * @license AGPL v3
- * @version 2.3.1
+ * @version 2.4.0
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE as published by
@@ -34,6 +34,7 @@ class addScriptToQuestion extends PluginBase
           'type'=>'select',
           'label' => 'Position for the script',
           'options'=>array(
+            'afteranswer'=>"The script is inserted just after answer part.",
             CClientScript::POS_HEAD=>"The script is inserted in the head section right before the title element (POS_HEAD).",
             CClientScript::POS_BEGIN=>"The script is inserted at the beginning of the body section (POS_BEGIN).",
             CClientScript::POS_END=>"The script is inserted at the end of the body section (POS_END).",
@@ -72,7 +73,18 @@ class addScriptToQuestion extends PluginBase
       } else {
         $script=LimeExpressionManager::ProcessString($aAttributes['javascript'], $oEvent->get('qid'), $aReplacement, false, 2, 0, false, false, true);
       }
-      $aAttributes['scriptPosition']=isset($aAttributes['scriptPosition']) ? $aAttributes['scriptPosition'] : CClientScript::POS_END;
+      if($this->get('scriptPositionAvailable')) {
+        $scriptPosition = isset($aAttributes['scriptPosition']) ? $aAttributes['scriptPosition'] : $this->get('scriptPositionDefault');
+      } else {
+        $scriptPosition = $this->get('scriptPositionDefault');
+      }
+      if($scriptPosition == 'afteranswer') {
+        $script = "\n\n<script type=\"text/javascript\">\n"
+                . $script."\n"
+                . "</script>";
+        $oEvent->set('answers',$oEvent->get('answers').$script);
+        return;
+      }
       App()->getClientScript()->registerScript("scriptAttribute{$oEvent->get('qid')}",$script,$aAttributes['scriptPosition']);
     }
   }
@@ -86,42 +98,43 @@ class addScriptToQuestion extends PluginBase
     $scriptAttributes = array(
       'scriptActivate' => array(
         'types'     => '15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* all question types */
-        'category'  => gT('Script'),
+        'category'  => $this->_translate('Script'),
         'sortorder' => 1,
         'inputtype' => 'switch',
         'readonly'=>$readonly,
-        'caption'   => 'Activate script execution',
+        'caption'   => $this->_translate('Activate script execution'),
         'default'   => '1',
       ),
       'javascript'=>array(
         'types'=>'15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* Whole question type */
-        'category'=>gT('Script'), /* Workaround ? Tony Partner :)))) ? */
+        'category'=>$this->_translate('Script'), /* Workaround ? Tony Partner :)))) ? */
         'sortorder'=>1, /* Own category */
         'inputtype'=>'textarea',
         'default'=>'', /* not needed (it's already the default) */
         'expression'=>1,/* As static */
         'readonly'=>$readonly,
-        'help'=>$this->gT("You don't have to add script tag, script is register by LimeSurvey. You can use expressions, this one is static (no update during run-time)."),
-        'caption'=>$this->gT('Javascript for this question'),
+        'help'=>$this->_translate("You don't have to add script tag, script is register by LimeSurvey. You can use expressions, this one is static (no update during run-time)."),
+        'caption'=>$this->_translate('Javascript for this question'),
       ),
     );
     if($this->get('scriptPositionAvailable',null,null,$this->settings['scriptPositionAvailable']['default']) && !$readonly){
       $scriptAttributes['scriptPosition']=array(
         'types'=>'15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* Whole question type */
-        'category'=>gT('Script'),
+        'category'=>$this->_translate('Script'),
         'sortorder'=>1,
         'inputtype'=>'singleselect',
         'options'=>array(
-          CClientScript::POS_HEAD=>$this->gT("The script is inserted in the head section right before the title element (POS_HEAD)."),
-          CClientScript::POS_BEGIN=>$this->gT("The script is inserted at the beginning of the body section (POS_BEGIN)."),
-          CClientScript::POS_END=>$this->gT("The script is inserted at the end of the body section (POS_END)."),
-          CClientScript::POS_LOAD=>$this->gT("The script is inserted in the window.onload() function (POS_LOAD)."),
-          CClientScript::POS_READY=>$this->gT("The script is inserted in the jQuery's ready function (POS_READY)."),
+          'afteranswer'=>$this->_translate("The script is inserted just after answer part."),
+          CClientScript::POS_HEAD=>$this->_translate("The script is inserted in the head section right before the title element (POS_HEAD)."),
+          CClientScript::POS_BEGIN=>$this->_translate("The script is inserted at the beginning of the body section (POS_BEGIN)."),
+          CClientScript::POS_END=>$this->_translate("The script is inserted at the end of the body section (POS_END)."),
+          CClientScript::POS_LOAD=>$this->_translate("The script is inserted in the window.onload() function (POS_LOAD)."),
+          CClientScript::POS_READY=>$this->_translate("The script is inserted in the jQuery's ready function (POS_READY)."),
         ),
         'default'=>$this->get('scriptPositionDefault',null,null,$this->settings['scriptPositionDefault']['default']),
         'readonly'=>$readonly,
-        'help'=>sprintf($this->gT('Set the position of the script, see <a href="%s">Yii manual</a>.'),'http://www.yiiframework.com/doc/api/1.1/CClientScript#registerScript-detail'),
-        'caption'=>$this->gT('Position for the script'),
+        'help'=>sprintf($this->_translate('Set the position of the script, see <a href="%s">Yii manual</a>.'),'http://www.yiiframework.com/doc/api/1.1/CClientScript#registerScript-detail'),
+        'caption'=>$this->_translate('Position for the script'),
       );
     }
 
@@ -132,5 +145,16 @@ class addScriptToQuestion extends PluginBase
       $questionAttributes=array_merge($questionAttributes,$scriptAttributes);
       $this->event->set('questionAttributes',$questionAttributes);
     }
+  }
+
+  /**
+  * @see parent::gT
+  */
+  private function _translate($sToTranslate, $sEscapeMode = 'unescaped', $sLanguage = null)
+  {
+    if(is_callable($this, 'gT')) {
+      return $this->gT($sToTranslate,$sEscapeMode,$sLanguage);
+    }
+    return $sToTranslate;
   }
 }
