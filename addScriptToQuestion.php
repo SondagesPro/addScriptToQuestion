@@ -52,6 +52,7 @@ class addScriptToQuestion extends PluginBase
   {
     $this->subscribe('beforeQuestionRender','addScript');
     $this->subscribe('newQuestionAttributes','addScriptAttribute');
+    $this->subscribe('getQuestionAttributes','addScriptAttribute');
   }
 
   /**
@@ -60,8 +61,11 @@ class addScriptToQuestion extends PluginBase
    */
   public function addScript()
   {
-    $oEvent=$this->getEvent();
-    $aAttributes=QuestionAttribute::model()->getQuestionAttributes($oEvent->get('qid'));
+    if (!$this->getEvent()) {
+      throw new CHttpException(403);
+    }
+    $oEvent = $this->getEvent();
+    $aAttributes = QuestionAttribute::model()->getQuestionAttributes($oEvent->get('qid'));
     if(isset($aAttributes['javascript']) && trim($aAttributes['javascript']) && $aAttributes['scriptActivate'] == 1){
       $aReplacement=array(
         'QID'=>$oEvent->get('qid'),
@@ -94,18 +98,28 @@ class addScriptToQuestion extends PluginBase
    */
   public function addScriptAttribute()
   {
+    if (!$this->getEvent()) {
+      throw new CHttpException(403);
+    }
     $readonly = Yii::app()->getConfig('filterxsshtml') && !Permission::model()->hasGlobalPermission('superadmin', 'read');
     $scriptAttributes = array(
       'scriptActivate' => array(
+        'name'      => 'script_activate',
         'types'     => '15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* all question types */
         'category'  => $this->_translate('Script'),
         'sortorder' => 1,
         'inputtype' => 'switch',
+        'options'   => array(
+          0 => gT('No'),
+          1 => gT('Yes'),
+        ),
         'readonly'=>$readonly,
         'caption'   => $this->_translate('Activate script execution'),
         'default'   => '1',
+        'help' => '',
       ),
       'javascript'=>array(
+        'name'      => 'javascript',
         'types'=>'15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* Whole question type */
         'category'=>$this->_translate('Script'), /* Workaround ? Tony Partner :)))) ? */
         'sortorder'=>1, /* Own category */
@@ -117,8 +131,17 @@ class addScriptToQuestion extends PluginBase
         'caption'=>$this->_translate('Javascript for this question'),
       ),
     );
+    if(version_compare(Yii::app()->getConfig('versionnumber'),"4",">=")) {
+        $scriptAttributes['scriptActivate']['options']= array(
+          'option'=> array(
+            array('value'=>0, 'text'=> gT("No")),
+            array('value'=>1, 'text'=> gT("Yes")),
+          ),
+        );
+    }
     if($this->get('scriptPositionAvailable',null,null,$this->settings['scriptPositionAvailable']['default']) && !$readonly){
       $scriptAttributes['scriptPosition']=array(
+        'name'      => 'scriptPosition',
         'types'=>'15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* Whole question type */
         'category'=>$this->_translate('Script'),
         'sortorder'=>1,
@@ -135,9 +158,15 @@ class addScriptToQuestion extends PluginBase
         'readonly'=>$readonly,
         'help'=>sprintf($this->_translate('Set the position of the script, see <a href="%s">Yii manual</a>.'),'http://www.yiiframework.com/doc/api/1.1/CClientScript#registerScript-detail'),
         'caption'=>$this->_translate('Position for the script'),
+        'help' => '',
       );
+    if(version_compare(Yii::app()->getConfig('versionnumber'),"4",">=")) {
+        $scriptAttributes['scriptPosition']['options']= array( 
+          'option'=>$scriptAttributes['scriptPosition']['options'],
+        );
+        unset($scriptAttributes['scriptActivate']['types']);
     }
-
+    }
     if(method_exists($this->getEvent(),'append')) {
       $this->getEvent()->append('questionAttributes', $scriptAttributes);
     } else {
@@ -157,4 +186,5 @@ class addScriptToQuestion extends PluginBase
     }
     return $sToTranslate;
   }
+
 }
