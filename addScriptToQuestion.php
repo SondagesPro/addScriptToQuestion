@@ -5,7 +5,7 @@
  * @author Denis Chenu <denis@sondages.pro>
  * @copyright 2016-2018 Denis Chenu <http://www.sondages.pro>
  * @license AGPL v3
- * @version 2.4.3-beta1
+ * @version 2.4.3-beta2
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE as published by
@@ -69,6 +69,11 @@ class addScriptToQuestion extends PluginBase
     $oEvent = $this->getEvent();
     $aAttributes = QuestionAttribute::model()->getQuestionAttributes($oEvent->get('qid'));
     // Still don't work in 4.25.0
+    if(floatval(App()->getConfig('versionnumber') >= 4.5) && App()->getConfig('debug')) {
+      if(!isset($aAttributes['javascript'])) {
+        throw new CHttpException(500, 'Seems not working');
+      }
+    }
     if(isset($aAttributes['javascript']) && trim($aAttributes['javascript']) && $aAttributes['scriptActivate'] == 1){
       $aReplacement=array(
         'QID'=>$oEvent->get('qid'),
