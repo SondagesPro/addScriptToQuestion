@@ -5,7 +5,7 @@
  * @author Denis Chenu <denis@sondages.pro>
  * @copyright 2016-2018 Denis Chenu <http://www.sondages.pro>
  * @license AGPL v3
- * @version 2.4.2
+ * @version 2.4.3-beta1
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE as published by
@@ -26,11 +26,13 @@ class addScriptToQuestion extends PluginBase
   protected $storage = 'DbStorage';
   protected $settings = array(
       'scriptPositionAvailable'=>array(
+          'name' => 'scriptPositionAvailable',
           'type'=>'boolean',
           'label' => 'Show the scriptPosition attribute',
           'default' => 0,
       ),
       'scriptPositionDefault'=>array(
+          'name' => 'scriptPositionDefault',
           'type'=>'select',
           'label' => 'Position for the script',
           'options'=>array(
@@ -66,6 +68,7 @@ class addScriptToQuestion extends PluginBase
     }
     $oEvent = $this->getEvent();
     $aAttributes = QuestionAttribute::model()->getQuestionAttributes($oEvent->get('qid'));
+    // Still don't work in 4.25.0
     if(isset($aAttributes['javascript']) && trim($aAttributes['javascript']) && $aAttributes['scriptActivate'] == 1){
       $aReplacement=array(
         'QID'=>$oEvent->get('qid'),
@@ -116,7 +119,7 @@ class addScriptToQuestion extends PluginBase
         'readonly'=>$readonly,
         'caption'   => $this->_translate('Activate script execution'),
         'default'   => '1',
-        'help' => '',
+        'help' => "", // Tested with null, without set etc … same issue
       ),
       'javascript'=>array(
         'name'      => 'javascript',
@@ -131,14 +134,7 @@ class addScriptToQuestion extends PluginBase
         'caption'=>$this->_translate('Javascript for this question'),
       ),
     );
-    if(version_compare(Yii::app()->getConfig('versionnumber'),"4",">=")) {
-        $scriptAttributes['scriptActivate']['options']= array(
-          'option'=> array(
-            array('value'=>0, 'text'=> gT("No")),
-            array('value'=>1, 'text'=> gT("Yes")),
-          ),
-        );
-    }
+
     if($this->get('scriptPositionAvailable',null,null,$this->settings['scriptPositionAvailable']['default']) && !$readonly){
       $scriptAttributes['scriptPosition']=array(
         'name'      => 'scriptPosition',
@@ -158,14 +154,7 @@ class addScriptToQuestion extends PluginBase
         'readonly'=>$readonly,
         'help'=>sprintf($this->_translate('Set the position of the script, see <a href="%s">Yii manual</a>.'),'http://www.yiiframework.com/doc/api/1.1/CClientScript#registerScript-detail'),
         'caption'=>$this->_translate('Position for the script'),
-        'help' => '',
       );
-    if(version_compare(Yii::app()->getConfig('versionnumber'),"4",">=")) {
-        $scriptAttributes['scriptPosition']['options']= array( 
-          'option'=>$scriptAttributes['scriptPosition']['options'],
-        );
-        unset($scriptAttributes['scriptActivate']['types']);
-    }
     }
     if(method_exists($this->getEvent(),'append')) {
       $this->getEvent()->append('questionAttributes', $scriptAttributes);
