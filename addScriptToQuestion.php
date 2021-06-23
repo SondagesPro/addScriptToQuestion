@@ -3,9 +3,9 @@
  * Allow to add script to question.
  *
  * @author Denis Chenu <denis@sondages.pro>
- * @copyright 2016-2018 Denis Chenu <http://www.sondages.pro>
+ * @copyright 2016-2021 Denis Chenu <http://www.sondages.pro>
  * @license AGPL v3
- * @version 2.4.3-beta2
+ * @version 2.5.0
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE as published by
@@ -68,13 +68,13 @@ class addScriptToQuestion extends PluginBase
     }
     $oEvent = $this->getEvent();
     $aAttributes = QuestionAttribute::model()->getQuestionAttributes($oEvent->get('qid'));
-    // Still don't work in 4.25.0
-    if(floatval(App()->getConfig('versionnumber') >= 4.5) && App()->getConfig('debug')) {
-      if(!isset($aAttributes['javascript'])) {
-        throw new CHttpException(500, 'Seems not working');
+    if(!isset($aAttributes['javascript'])) {
+        if(App()->getConfig('debug') > 1) {
+        throw new CHttpException(500, sprintf('Seems not working on %s', App()->getConfig('versionnumber')));
       }
+      return;
     }
-    if(isset($aAttributes['javascript']) && trim($aAttributes['javascript']) && $aAttributes['scriptActivate'] == 1){
+    if(trim($aAttributes['javascript']) && $aAttributes['scriptActivate'] == 1){
       $aReplacement=array(
         'QID'=>$oEvent->get('qid'),
         'GID'=>$oEvent->get('gid'),
@@ -139,7 +139,6 @@ class addScriptToQuestion extends PluginBase
         'caption'=>$this->_translate('Javascript for this question'),
       ),
     );
-
     if($this->get('scriptPositionAvailable',null,null,$this->settings['scriptPositionAvailable']['default']) && !$readonly){
       $scriptAttributes['scriptPosition']=array(
         'name'      => 'scriptPosition',
@@ -148,12 +147,12 @@ class addScriptToQuestion extends PluginBase
         'sortorder'=>1,
         'inputtype'=>'singleselect',
         'options'=>array(
-          'afteranswer'=>$this->_translate("The script is inserted just after answer part."),
-          CClientScript::POS_HEAD=>$this->_translate("The script is inserted in the head section right before the title element (POS_HEAD)."),
+          CClientScript::POS_HEAD => $this->_translate("The script is inserted in the head section right before the title element (POS_HEAD)."),
           CClientScript::POS_BEGIN=>$this->_translate("The script is inserted at the beginning of the body section (POS_BEGIN)."),
           CClientScript::POS_END=>$this->_translate("The script is inserted at the end of the body section (POS_END)."),
           CClientScript::POS_LOAD=>$this->_translate("The script is inserted in the window.onload() function (POS_LOAD)."),
           CClientScript::POS_READY=>$this->_translate("The script is inserted in the jQuery's ready function (POS_READY)."),
+          'afteranswer'=>$this->_translate("The script is inserted just after answer part."), /* Move at bottom : issue with 0 (POS_HEAD) in 5.X */
         ),
         'default'=>$this->get('scriptPositionDefault',null,null,$this->settings['scriptPositionDefault']['default']),
         'readonly'=>$readonly,
@@ -179,6 +178,5 @@ class addScriptToQuestion extends PluginBase
       return $this->gT($sToTranslate,$sEscapeMode,$sLanguage);
     }
     return $sToTranslate;
-  }
-
+  } 
 }
