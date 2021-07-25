@@ -19,4 +19,5 @@
         <version>5</version>
     </compatibility>
     <lastSecurityUpdate>2.4.3</lastSecurityUpdate>
+    <updaters disabled="disabled"></updaters>
 </config>
