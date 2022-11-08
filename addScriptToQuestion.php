@@ -57,6 +57,11 @@ class addScriptToQuestion extends PluginBase
     $this->subscribe('getQuestionAttributes','addScriptAttribute');
   }
 
+  public function afterPluginLoad()
+  {
+    $this->fixDbByVersion();
+  }
+
   /**
    * Add the script when question is rendered
    * Add QID and SGQ replacement forced (because it's before this was added by core
@@ -109,56 +114,62 @@ class addScriptToQuestion extends PluginBase
     if (!$this->getEvent()) {
       throw new CHttpException(403);
     }
-    $readonly = Yii::app()->getConfig('filterxsshtml') && !Permission::model()->hasGlobalPermission('superadmin', 'read');
-    $scriptAttributes = array(
-      'scriptActivate' => array(
-        'name'      => 'script_activate',
-        'types'     => '15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* all question types */
-        'category'  => $this->_translate('Script'),
-        'sortorder' => 1,
-        'inputtype' => 'switch',
-        'options'   => array(
-          0 => gT('No'),
-          1 => gT('Yes'),
+    static $scriptAttributes;
+    static $count;
+    $count++;
+    tracevar($count);
+    if(!is_array($scriptAttributes)) {
+      $readonly = Yii::app()->getConfig('filterxsshtml') && !Permission::model()->hasGlobalPermission('superadmin', 'read');
+      $scriptAttributes = array(
+        'scriptActivate' => array(
+          'name'      => 'script_activate',
+          'types'     => '15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* all question types */
+          'category'  => $this->_translate('Script'),
+          'sortorder' => 1,
+          'inputtype' => 'switch',
+          'options'   => array(
+            0 => gT('No'),
+            1 => gT('Yes'),
+          ),
+          'readonly'=>$readonly,
+          'caption'   => $this->_translate('Activate script execution'),
+          'default'   => '1',
+          'help' => "", // Tested with null, without set etc … same issue
         ),
-        'readonly'=>$readonly,
-        'caption'   => $this->_translate('Activate script execution'),
-        'default'   => '1',
-        'help' => "", // Tested with null, without set etc … same issue
-      ),
-      'javascript'=>array(
-        'name'      => 'javascript',
-        'types'=>'15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* Whole question type */
-        'category'=>$this->_translate('Script'), /* Workaround ? Tony Partner :)))) ? */
-        'sortorder'=>1, /* Own category */
-        'inputtype'=>'textarea',
-        'default'=>'', /* not needed (it's already the default) */
-        'expression'=>1,/* As static */
-        'readonly'=>$readonly,
-        'help'=>$this->_translate("You don't have to add script tag, script is register by LimeSurvey. You can use expressions, this one is static (no update during run-time)."),
-        'caption'=>$this->_translate('Javascript for this question'),
-      ),
-    );
-    if($this->get('scriptPositionAvailable',null,null,$this->settings['scriptPositionAvailable']['default']) && !$readonly){
-      $scriptAttributes['scriptPosition']=array(
-        'name'      => 'scriptPosition',
-        'types'=>'15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* Whole question type */
-        'category'=>$this->_translate('Script'),
-        'sortorder'=>1,
-        'inputtype'=>'singleselect',
-        'options'=>array(
-          CClientScript::POS_HEAD => $this->_translate("The script is inserted in the head section right before the title element (POS_HEAD)."),
-          CClientScript::POS_BEGIN=>$this->_translate("The script is inserted at the beginning of the body section (POS_BEGIN)."),
-          CClientScript::POS_END=>$this->_translate("The script is inserted at the end of the body section (POS_END)."),
-          CClientScript::POS_LOAD=>$this->_translate("The script is inserted in the window.onload() function (POS_LOAD)."),
-          CClientScript::POS_READY=>$this->_translate("The script is inserted in the jQuery's ready function (POS_READY)."),
-          'afteranswer'=>$this->_translate("The script is inserted just after answer part."), /* Move at bottom : issue with 0 (POS_HEAD) in 5.X */
+        'javascript'=>array(
+          'name'      => 'javascript',
+          'types'=>'15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* Whole question type */
+          'category'=>$this->_translate('Script'), /* Workaround ? Tony Partner :)))) ? */
+          'sortorder'=>1, /* Own category */
+          'inputtype'=>'textarea',
+          'default'=>'', /* not needed (it's already the default) */
+          'expression'=>1,/* As static */
+          'readonly'=>$readonly,
+          'help'=>$this->_translate("You don't have to add script tag, script is register by LimeSurvey. You can use expressions, this one is static (no update during run-time)."),
+          'caption'=>$this->_translate('Javascript for this question'),
         ),
-        'default'=>$this->get('scriptPositionDefault',null,null,$this->settings['scriptPositionDefault']['default']),
-        'readonly'=>$readonly,
-        'help'=>sprintf($this->_translate('Set the position of the script, see <a href="%s">Yii manual</a>.'),'http://www.yiiframework.com/doc/api/1.1/CClientScript#registerScript-detail'),
-        'caption'=>$this->_translate('Position for the script'),
       );
+      if($this->get('scriptPositionAvailable',null,null,$this->settings['scriptPositionAvailable']['default']) && !$readonly){
+        $scriptAttributes['scriptPosition']=array(
+          'name'      => 'scriptPosition',
+          'types'=>'15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* Whole question type */
+          'category'=>$this->_translate('Script'),
+          'sortorder'=>1,
+          'inputtype'=>'singleselect',
+          'options'=>array(
+            CClientScript::POS_HEAD => $this->_translate("The script is inserted in the head section right before the title element (POS_HEAD)."),
+            CClientScript::POS_BEGIN=>$this->_translate("The script is inserted at the beginning of the body section (POS_BEGIN)."),
+            CClientScript::POS_END=>$this->_translate("The script is inserted at the end of the body section (POS_END)."),
+            CClientScript::POS_LOAD=>$this->_translate("The script is inserted in the window.onload() function (POS_LOAD)."),
+            CClientScript::POS_READY=>$this->_translate("The script is inserted in the jQuery's ready function (POS_READY)."),
+            'afteranswer'=>$this->_translate("The script is inserted just after answer part."), /* Move at bottom : issue with 0 (POS_HEAD) in 5.X */
+          ),
+          'default'=>$this->get('scriptPositionDefault',null,null,$this->settings['scriptPositionDefault']['default']),
+          'readonly'=>$readonly,
+          'help'=>sprintf($this->_translate('Set the position of the script, see <a href="%s">Yii manual</a>.'),'http://www.yiiframework.com/doc/api/1.1/CClientScript#registerScript-detail'),
+          'caption'=>$this->_translate('Position for the script'),
+        );
+      }
     }
     if(method_exists($this->getEvent(),'append')) {
       $this->getEvent()->append('questionAttributes', $scriptAttributes);
