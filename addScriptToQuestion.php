@@ -54,7 +54,7 @@ class addScriptToQuestion extends PluginBase
   {
     $this->subscribe('beforeQuestionRender','addScript');
     $this->subscribe('newQuestionAttributes','addScriptAttribute');
-    $this->subscribe('getQuestionAttributes','addScriptAttribute');
+    //$this->subscribe('getQuestionAttributes','addScriptAttribute');
   }
 
   public function afterPluginLoad()
@@ -111,9 +111,7 @@ class addScriptToQuestion extends PluginBase
    */
   public function addScriptAttribute()
   {
-    if (!$this->getEvent()) {
-      throw new CHttpException(403);
-    }
+    $eventQuestionAttribute = $this->getEvent();
     static $scriptAttributes;
     static $count;
     $count++;
@@ -172,11 +170,11 @@ class addScriptToQuestion extends PluginBase
       }
     }
     if(method_exists($this->getEvent(),'append')) {
-      $this->getEvent()->append('questionAttributes', $scriptAttributes);
+      $eventQuestionAttribute->append('questionAttributes', $scriptAttributes);
     } else {
       $questionAttributes=(array)$this->event->get('questionAttributes');
       $questionAttributes=array_merge($questionAttributes,$scriptAttributes);
-      $this->event->set('questionAttributes',$questionAttributes);
+      $eventQuestionAttribute->set('questionAttributes',$questionAttributes);
     }
   }
 
