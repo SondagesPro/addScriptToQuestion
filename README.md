@@ -29,6 +29,7 @@ Translation can be done at [translate.sondages.pro](https://translate.sondages.p
 - HomePage <http://extensions.sondages.pro/>
 - Copyright © 2016-2018 Denis Chenu <http://sondages.pro>
 - Licence : GNU Affero General Public License <https://www.gnu.org/licenses/agpl-3.0.html>
+- [Donate](https://support.sondages.pro/open.php?topicId=12), [Liberapay](https://liberapay.com/SondagesPro/), [OpenCollective](https://opencollective.com/sondagespro) 
 
 ## Changelog
 - 2018-05-27 [2.3.1] Quick enable/disable script
