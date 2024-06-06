@@ -4,9 +4,9 @@
  * Allow to add script to question.
  *
  * @author Denis Chenu <denis@sondages.pro>
- * @copyright 2016-2021 Denis Chenu <http://www.sondages.pro>
+ * @copyright 2016-2024 Denis Chenu <http://www.sondages.pro>
  * @license AGPL v3
- * @version 2.5.1-alpha
+ * @version 2.5.1
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE as published by
@@ -47,9 +47,12 @@ class addScriptToQuestion extends PluginBase
       ),
     );
 
-  /**
-  * Add function to be used in beforeQuestionRender event and to attriubute
-  */
+    /** Avoid multiple call of same setting */
+    private static $scriptAttributes = null;
+
+    /**
+    * Add function to be used in beforeQuestionRender event and to attriubute
+    */
     public function init()
     {
         $this->subscribe('beforeQuestionRender', 'addScript');
@@ -109,70 +112,73 @@ class addScriptToQuestion extends PluginBase
         if (!$this->getEvent()) {
             throw new CHttpException(403);
         }
-        $readonly = Yii::app()->getConfig('filterxsshtml') && !Permission::model()->hasGlobalPermission('superadmin', 'read');
-        $scriptAttributes = array(
-        'scriptActivate' => array(
-        'name'      => 'script_activate',
-        'types'     => '15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* all question types */
-        'category'  => $this->translate('Script'),
-        'sortorder' => 1,
-        'inputtype' => 'switch',
-        'options'   => array(
-          0 => gT('No'),
-          1 => gT('Yes'),
-        ),
-        'readonly' => $readonly,
-        'caption'   => $this->translate('Activate script execution'),
-        'default'   => '1',
-        'help' => "", // Tested with null, without set etc … same issue
-        ),
-        'javascript' => array(
-        'name'      => 'javascript',
-        'types' => '15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* Whole question type */
-        'category' => $this->translate('Script'), /* Workaround ? Tony Partner :)))) ? */
-        'sortorder' => 1, /* Own category */
-        'inputtype' => 'textarea',
-        'default' => '', /* not needed (it's already the default) */
-        'expression' => 1,/* As static */
-        'readonly' => $readonly,
-        'help' => $this->translate("You don't have to add script tag, script is register by LimeSurvey. You can use expressions, this one is static (no update during run-time)."),
-        'caption' => $this->translate('Javascript for this question'),
-        ),
-        );
-        if ($this->get('scriptPositionAvailable', null, null, $this->settings['scriptPositionAvailable']['default']) && !$readonly) {
-            $scriptAttributes['scriptPosition'] = array(
-            'name'      => 'scriptPosition',
-            'types' => '15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* Whole question type */
-            'category' => $this->translate('Script'),
-            'sortorder' => 1,
-            'inputtype' => 'singleselect',
-            'options' => array(
-            CClientScript::POS_HEAD => $this->translate("The script is inserted in the head section right before the title element (POS_HEAD)."),
-            CClientScript::POS_BEGIN => $this->translate("The script is inserted at the beginning of the body section (POS_BEGIN)."),
-            CClientScript::POS_END => $this->translate("The script is inserted at the end of the body section (POS_END)."),
-            CClientScript::POS_LOAD => $this->translate("The script is inserted in the window.onload() function (POS_LOAD)."),
-            CClientScript::POS_READY => $this->translate("The script is inserted in the jQuery's ready function (POS_READY)."),
-            'afteranswer' => $this->translate("The script is inserted just after answer part."), /* Move at bottom : issue with 0 (POS_HEAD) in 5.X */
-            ),
-            'default' => $this->get('scriptPositionDefault', null, null, $this->settings['scriptPositionDefault']['default']),
-            'readonly' => $readonly,
-            'help' => sprintf($this->translate('Set the position of the script, see <a href="%s">Yii manual</a>.'), 'http://www.yiiframework.com/doc/api/1.1/CClientScript#registerScript-detail'),
-            'caption' => $this->translate('Position for the script'),
+        if (!isset(self::$scriptAttributes)) {
+            $readonly = Yii::app()->getConfig('filterxsshtml') && !Permission::model()->hasGlobalPermission('superadmin', 'read');
+            self::$scriptAttributes = array(
+                'scriptActivate' => array(
+                'name'      => 'script_activate',
+                'types'     => '15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* all question types */
+                'category'  => $this->translate('Script'),
+                'sortorder' => 1,
+                'inputtype' => 'switch',
+                'options'   => array(
+                      0 => gT('No'),
+                      1 => gT('Yes'),
+                ),
+                    'readonly' => $readonly,
+                    'caption'   => $this->translate('Activate script execution'),
+                    'default'   => '1',
+                    'help' => "", // Tested with null, without set etc … same issue
+                ),
+                    'javascript' => array(
+                    'name'      => 'javascript',
+                    'types' => '15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* Whole question type */
+                    'category' => $this->translate('Script'), /* Workaround ? Tony Partner :)))) ? */
+                    'sortorder' => 1, /* Own category */
+                    'inputtype' => 'textarea',
+                    'default' => '', /* not needed (it's already the default) */
+                    'expression' => 1,/* As static */
+                    'readonly' => $readonly,
+                    'help' => $this->translate("You don't have to add script tag, script is register by LimeSurvey. You can use expressions, this one is static (no update during run-time)."),
+                    'caption' => $this->translate('Javascript for this question'),
+                ),
             );
+            if ($this->get('scriptPositionAvailable', null, null, $this->settings['scriptPositionAvailable']['default']) && !$readonly) {
+                self::$scriptAttributes['scriptPosition'] = array(
+                    'name'      => 'scriptPosition',
+                    'types' => '15ABCDEFGHIKLMNOPQRSTUWXYZ!:;|*', /* Whole question type */
+                    'category' => $this->translate('Script'),
+                    'sortorder' => 1,
+                    'inputtype' => 'singleselect',
+                    'options' => array(
+                        CClientScript::POS_HEAD => $this->translate("The script is inserted in the head section right before the title element (POS_HEAD)."),
+                        CClientScript::POS_BEGIN => $this->translate("The script is inserted at the beginning of the body section (POS_BEGIN)."),
+                        CClientScript::POS_END => $this->translate("The script is inserted at the end of the body section (POS_END)."),
+                        CClientScript::POS_LOAD => $this->translate("The script is inserted in the window.onload() function (POS_LOAD)."),
+                        CClientScript::POS_READY => $this->translate("The script is inserted in the jQuery's ready function (POS_READY)."),
+                        'afteranswer' => $this->translate("The script is inserted just after answer part."), /* Move at bottom : issue with 0 (POS_HEAD) in 5.X */
+                    ),
+                    'default' => $this->get('scriptPositionDefault', null, null, $this->settings['scriptPositionDefault']['default']),
+                    'readonly' => $readonly,
+                    'help' => sprintf($this->translate('Set the position of the script, see <a href="%s">Yii manual</a>.'), 'http://www.yiiframework.com/doc/api/1.1/CClientScript#registerScript-detail'),
+                    'caption' => $this->translate('Position for the script'),
+                );
+            }
         }
+
         if (method_exists($this->getEvent(), 'append')) {
-            $this->getEvent()->append('questionAttributes', $scriptAttributes);
+            $this->getEvent()->append('questionAttributes', self::$scriptAttributes);
         } else {
             $questionAttributes = (array)$this->event->get('questionAttributes');
-            $questionAttributes = array_merge($questionAttributes, $scriptAttributes);
+            $questionAttributes = array_merge($questionAttributes, self::$scriptAttributes);
             $this->event->set('questionAttributes', $questionAttributes);
         }
     }
 
-  /**
-  * @see parent::gT
-  */
-    private function _translate($sToTranslate, $sEscapeMode = 'unescaped', $sLanguage = null)
+    /**
+    * @see parent::gT
+    */
+    private function translate($sToTranslate, $sEscapeMode = 'unescaped', $sLanguage = null)
     {
         if (is_callable($this, 'gT')) {
             return $this->gT($sToTranslate, $sEscapeMode, $sLanguage);
